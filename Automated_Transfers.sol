@@ -4,6 +4,7 @@ contract DataTypes{
     uint public playerCount=0;
     uint public pot =0;
     address public dealer;
+    player [] public playersInGame;
     mapping(address => player) public players;
     enum level {Novice, Intermediate, Advanced}
     struct player{
@@ -25,7 +26,7 @@ contract DataTypes{
         player storage Player = players[playerAddress];
         return Player.playerLevel;
     }
-    function changePlayerLevel(address playerAddress) public{
+    function changePlayerLevel(address playerAddress) private{
         player storage Player = players[playerAddress];
         if(block.timestamp >= Player.timeCreated + 60){
             Player.playerLevel = level.Advanced;
@@ -39,12 +40,15 @@ contract DataTypes{
             pot += 25;
         }
     }
-    function payOutWinners() public{
+    function payOutWinners(address loserAddress) payable public{
         require(msg.sender == dealer, "Only the dealer can pay out the winner");
         require(msg.value == pot * (1 ether));
         uint payoutPerWinner = msg.value / (playerCount -1);
         for(uint i=0; i < playersInGame.length; i++){
-
+            address currentPlayerAddress = playersInGame[i].playerAddress;
+            if(currentPlayerAddress != loserAddress){
+                payable(currentPlayerAddress).transfer(payoutPerWinner);
+            }
         }
     }
 }
