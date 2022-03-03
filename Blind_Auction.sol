@@ -44,8 +44,11 @@ contract BlindAuction{
     function generateBlindedBidBytes32(uint value, bool fake) public view returns (bytes32){
         return keccak256(abi.encodePacked(value, fake));
     }
-    function bid(bytes32 _blindedBid) public payable {
-
+    function bid(bytes32 _blindedBid) public payable onlyBefore(biddingEnd){
+        bids[msg.sender].push(Bid({
+            blindedBid: _blindedBid,
+            deposit: msg.value
+        }));
     }
 
     function withdraw() public {
@@ -55,11 +58,22 @@ contract BlindAuction{
             payable(msg.sender).transfer(amount);
         }
     }
-    function placeBid(){
-
+    function placeBid(address bidder, uint value) internal returns(bool success){
+        if(value<= highestBid){
+            return false;
+        }
+        if(highestBidder != address(0)){
+            pendingReturns[highestBidder] += highestBid;
+        }
+        highestBid = value;
+        highestBidder= bidder;
+        return true;
     }
-    function auctionEnd(){
-
+    function auctionEnd()public payable onlyAfter(revealEnd){
+        require(!ended);
+        emit AuctionEnded(highestBidder, highestBid);
+        ended = true;
+        beneficiary.transfer(highestBid);
     }
     function reveal(){
 
