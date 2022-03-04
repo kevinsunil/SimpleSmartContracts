@@ -75,7 +75,23 @@ contract BlindAuction{
         ended = true;
         beneficiary.transfer(highestBid);
     }
-    function reveal(){
-
+    function reveal(uint[] memory _values, bool[] memory _fake) public onlyAfter(biddingEnd) onlyBefore(revealEnd){
+        uint length = bids[msg.sender].length;
+        require(_values.length == length);
+        require(_fake.length == length);
+        uint refund;
+        for(uint i=0; i< length; i++){
+            Bid storage bidToCheck = bids[msg.sender][i];
+            (uint value, bool fake) = (_values[i], _fake[i]);
+            if(bidToCheck.blindedBid != keccak256(abi.encodePacked(value, fake))){
+                continue;
+            }
+            refund += bidToCheck.deposit;
+            if(!fake && bidToCheck.deposit >= value){
+                if(placeBid(msg.sender, value)){
+                    refund -= value;
+                }
+            }
+        }
     }
 }
