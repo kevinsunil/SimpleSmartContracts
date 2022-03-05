@@ -79,19 +79,23 @@ contract BlindAuction{
         uint length = bids[msg.sender].length;
         require(_values.length == length);
         require(_fake.length == length);
-        uint refund;
+        // uint refund;
         for(uint i=0; i< length; i++){
             Bid storage bidToCheck = bids[msg.sender][i];
             (uint value, bool fake) = (_values[i], _fake[i]);
             if(bidToCheck.blindedBid != keccak256(abi.encodePacked(value, fake))){
                 continue;
             }
-            refund += bidToCheck.deposit;
+            // refund += bidToCheck.deposit;
             if(!fake && bidToCheck.deposit >= value){
-                if(placeBid(msg.sender, value)){
-                    refund -= value;
+                //  if(placeBid(msg.sender, value)){
+                if(!placeBid(msg.sender, value)){
+                    // refund -= value;
+                    payable(msg.sender).transfer(bidToCheck.deposit * (1 ether));
                 }
             }
+            bidToCheck.blindedBid = bytes32(0);
         }
+        // payable(msg.sender).transfer(refund);
     }
 }
