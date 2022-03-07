@@ -10,21 +10,30 @@ contract Escrow{
     state public current_State;
     bool public isBuyerIn;
     bool public isSellerIn;
-    uint public prices;
+    uint public price;
 
     address public buyer;
-    address payable public 
+    address payable public seller; 
 
     //MODIFIERS
 
     modifier onlyBuyer(){
-        require();
+        require(msg.sender == buyer, "only buyer can call this function");
+        _;
     }
+
+    modifier escrowNotStarted(){
+        require(current_State == state.NOT_INITIATED);
+        _;
+    }
+
 
     //FUNCTIONS
 
-    constructor(){
-
+    constructor(address _buyer, address payable _seller, uint _price){
+        buyer = _buyer;
+        seller =_seller;
+        price = _price * (1 ether);
     }
 
     function initContract(){
