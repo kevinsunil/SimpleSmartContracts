@@ -36,12 +36,20 @@ contract Escrow{
         price = _price * (1 ether);
     }
 
-    function initContract(){
-
+    function initContract() escrowNotStarted public{
+        if(msg.sender == buyer){
+            isBuyerIn = true;
+        }
+        if(msg.sender == seller){
+            isSellerIn = true;
+        }
+        if(isBuyerIn && isSellerIn){
+            current_State = state.AWAITING_PAYEMENT;
+        }
     }
 
-    function deposit(){
-
+    function deposit() onlyBuyer public payable{
+        require(current_State == state.AWAITING_PAYEMENT, "Already Paid");
     }
 
     function confirmDelivery(){
