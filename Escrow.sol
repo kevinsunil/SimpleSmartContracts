@@ -50,6 +50,7 @@ contract Escrow{
 
     function deposit() onlyBuyer public payable{
         require(current_State == state.AWAITING_PAYEMENT, "Already Paid");
+        require(msg.value == price, "wrong deposit");
     }
 
     function confirmDelivery(){
