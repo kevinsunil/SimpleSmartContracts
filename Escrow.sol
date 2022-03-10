@@ -51,12 +51,17 @@ contract Escrow{
     function deposit() onlyBuyer public payable{
         require(current_State == state.AWAITING_PAYEMENT, "Already Paid");
         require(msg.value == price, "wrong deposit");
+        current_State =state.AWAITING_DELIVERY;
     }
 
-    function confirmDelivery(){
-
+    function confirmDelivery() onlyBuyer payable public{
+        require(current_State == state.AWAITING_DELIVERY, "Cannot confirm delivery");
+        seller.transfer(price);
+        current_State = state.COMPLETE;
     }
-    function withdraw(){
-
+    function withdraw() onlyBuyer payable public{
+        require(current_State== state.AWAITING_DELIVERY, "Cannot withdraw at this stage");
+        payable(msg.sender).transfer(price);
+        current_State = state.COMPLETE;
     }
 }
