@@ -14,7 +14,6 @@ contract Ballot{
 
     uint private countResult =0;
     uint public finalResult = 0;
-
     //MODIFIERS
 
     //EVENTS
