@@ -43,12 +43,16 @@ contract Ballot{
     //EVENTS
 
     //FUNCTIONS
-    constructor(){
-        string memory _ballotOfficialName;
-        string memory _proposal;
+    constructor(string memory _ballotOfficialName, string memory _proposal){
+       ballotOfficialAddress =msg.sender;
+       ballotOfficialName = _ballotOfficialName;
+       proposal = _proposal;
+        state = State.Created;
     }
 
-    function addVoter(){}
+    function addVoter(address _voterAddress, string memory _voterName) public inState(State.Created) onlyOfficial{
+        
+    }
 
     function startVote(){}
 
